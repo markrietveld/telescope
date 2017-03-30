@@ -582,7 +582,13 @@ class FileProvider extends ContentProvider {
         } else if (TAG_EXTERNAL.equals(tag)) {
           target = buildPath(Environment.getExternalStorageDirectory(), path);
         } else if (TAG_EXTERNAL_APP.equals(tag)) {
-          target = buildPath(context.getExternalFilesDir(null), path);
+          try {
+            // This sometimes causes an exception on API level 19
+            // Just avoid this specific file provider, so we can try to keep going
+            target = buildPath(context.getExternalFilesDir(null), path);
+          } catch (NullPointerException npe) {
+            npe.printStackTrace();
+          }
         }
 
         if (target != null) {
